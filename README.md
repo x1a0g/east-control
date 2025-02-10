@@ -1,8 +1,6 @@
 # east-control
 > javafx+jdk21编写的基于adb的手机群控软件，支持自定义组合执行流程，内置多种事件。
 
-项目为周末简单编写完成，稍显简陋，后续在工作之余会慢慢迭代
-
 ## 界面
 ![s1.png](image/s1.png)
 ![s2.png](image/s2.png)
