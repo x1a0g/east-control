@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -18,7 +19,7 @@
     <children>
         <TabPane prefHeight="494.0" prefWidth="858.0" tabClosingPolicy="UNAVAILABLE">
             <tabs>
-                <Tab text="手机连接" onSelectionChanged="#tabChange">
+                <Tab onSelectionChanged="#tabChange" text="手机连接">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="742.0" prefWidth="1280.0">
                             <children>
@@ -33,13 +34,13 @@
                                         <TableColumn fx:id="abilist64" prefWidth="83.99997558593748" text="cpu架构(64)" />
                                     </columns>
                                 </TableView>
-                        <ChoiceBox fx:id="chbox"  layoutX="566.0" layoutY="16.0" prefHeight="18.0" prefWidth="150.0" />
-                        <Button onAction="#startCon" layoutX="740.0" layoutY="13.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="86.0" text="开始" />
+                        <ChoiceBox fx:id="chbox" layoutX="566.0" layoutY="16.0" prefHeight="18.0" prefWidth="150.0" />
+                        <Button layoutX="740.0" layoutY="13.0" mnemonicParsing="false" onAction="#startCon" prefHeight="32.0" prefWidth="86.0" text="开始" />
                             </children>
                         </AnchorPane>
                     </content>
                 </Tab>
-            <Tab onSelectionChanged="#flowInit" text="定制">
+                <Tab onSelectionChanged="#flowInit" text="脚本录制">
                <content>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
@@ -109,6 +110,32 @@
                   </AnchorPane>
                </content>
             </Tab>
+                <Tab onSelectionChanged="#scInit" text="投屏控制">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <!-- 包裹GridPane的ScrollPane -->
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" AnchorPane.bottomAnchor="0"
+                                            AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+                                    <content>
+                                        <GridPane fx:id="ScGridPane"
+                                                  hgap="20" vgap="20"
+                                                  AnchorPane.topAnchor="0">
+                                            <!-- 只设置列约束 -->
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="ALWAYS" prefWidth="220" />
+                                                <ColumnConstraints hgrow="ALWAYS" prefWidth="220" />
+                                                <ColumnConstraints hgrow="ALWAYS" prefWidth="220" />
+                                                <ColumnConstraints hgrow="ALWAYS" prefWidth="220" />
+                                            </columnConstraints>
+                                            <!-- 行约束将在控制器中动态添加 -->
+                                        </GridPane>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
             </tabs>
         </TabPane>
     </children>
