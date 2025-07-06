@@ -1,11 +1,11 @@
 # east-control
 > javafx+jdk21编写的基于adb的手机群控软件，支持自定义组合执行流程，内置多种事件。
 
-项目为周末简单编写完成，稍显简陋，后续在工作之余会慢慢迭代
 
 ## 界面
 ![s1.png](image/s1.png)
 ![s2.png](image/s2.png)
+![s3.png](image/s3.png)
 ## 运行前准备
 ```bash
 1.本机安装ADB,配置到环境变量中
@@ -21,4 +21,8 @@ sqlite3 east-control
 #3.修改连接配置
 打开com.east.control.data.SQLiteDataSource修改为自己本地的数据库路径即可
 #4.配置jdk21环境+maven运行即可
+#5.下载scrcpy放入resource下的scrcpy目录
 ```
+
+## 2025-07-06
+- 添加scrcpy手机投屏功能

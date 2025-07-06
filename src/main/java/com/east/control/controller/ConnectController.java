@@ -1,7 +1,10 @@
 package com.east.control.controller;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.IORuntimeException;
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import com.east.control.EastApplication;
 import com.east.control.cons.EastCons;
@@ -11,7 +14,6 @@ import com.east.control.mapper.FlowMapper;
 import com.east.control.model.FlowInfo;
 import com.east.control.model.FlowItem;
 import com.east.control.utils.AdbAction;
-import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -30,8 +32,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -41,6 +41,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,6 +66,8 @@ public class ConnectController implements Initializable {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+
+    private List<String> deviceIdList = new ArrayList<>();
 
     @FXML
     private Label errmsg;
@@ -112,7 +115,20 @@ public class ConnectController implements Initializable {
         init();
         if (!ids.isEmpty()) {
             List<AdbAction.PhoneInfo> phoneInfo = adbAction.getPhoneInfo(ids);
+            deviceIdList =  phoneInfo.stream().map(AdbAction.PhoneInfo::getDeviceId).collect(Collectors.toList());
             infoTableView.setItems(FXCollections.observableArrayList(phoneInfo));
+
+            //截图并拉取回来
+            for (String id : ids) {
+                try {
+                    String shellSC = adbAction.buildSc(id);
+                    RuntimeUtil.execForStr(shellSC);
+                    String shellPullSc = adbAction.buildPullSc(id, "src/main/resources/image/");
+                    RuntimeUtil.execForStr(shellPullSc);
+                } catch (IORuntimeException e) {
+                    Console.error("获取截图出错，id:{}",id);
+                }
+            }
         }
     }
 
@@ -539,8 +555,7 @@ public class ConnectController implements Initializable {
         rowConstraints.clear();
 
         // 示例设备
-        List<String> deviceNames = Arrays.asList("设备1", "设备2", "设备3", "设备4", "设备5",
-                "设备6", "设备7", "设备8", "设备9", "设备10", "设备11", "设备12");
+        List<String> deviceNames = deviceIdList;
 
         int row = 0;
         int col = 0;
@@ -568,14 +583,25 @@ public class ConnectController implements Initializable {
             col++;
         }
 
-        // 设置GridPane高度为自动扩展
-        // 正确计算高度（基于行数）
-        int rows = (int) Math.ceil((double) deviceNames.size() / 5);
-        double rowHeight = 270; // 每行高度
-        double vgap = 20;      // 行间距
-        double padding = 10;   // 内边距
+        if(!deviceNames.isEmpty()){
+            // 设置GridPane高度为自动扩展
+            // 正确计算高度（基于行数）
+            int rows = (int) Math.ceil((double) deviceNames.size() / 5);
+            double rowHeight = 270; // 每行高度
+            double vgap = 20;      // 行间距
+            double padding = 10;   // 内边距
+            ScGridPane.setPrefHeight(rows * (rowHeight + vgap) + padding);
 
-        ScGridPane.setPrefHeight(rows * (rowHeight + vgap) + padding);
+        }else{
+            // 创建设备名称标签（居中样式）
+            Label nameLabel = new Label("无数据");
+            nameLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;");
+            nameLabel.setAlignment(Pos.CENTER);
+            // 使用VBox垂直排列图片和名称
+            VBox contentBox = new VBox();
+            contentBox.getChildren().add(nameLabel);
+        }
+
     }
 
     private StackPane createImageCard(String deviceName) {
@@ -592,7 +618,7 @@ public class ConnectController implements Initializable {
         contentBox.setSpacing(15);  // 图片和名称间距
 
         // 创建图片视图
-        StackPane imageContainer = createImageContainer();
+        StackPane imageContainer = createImageContainer(deviceName);
 
         // 创建设备名称标签（居中样式）
         Label nameLabel = new Label(deviceName);
@@ -611,20 +637,28 @@ public class ConnectController implements Initializable {
         card.setOnMouseExited(e -> card.setEffect(null));
 
         // 添加点击事件
-        card.setOnMouseClicked(e -> System.out.println("选择设备: " + deviceName));
+        card.setOnMouseClicked(e -> {
+            //掉起scrcpy
+            RuntimeUtil.exec("src/main/resources/scrcpy/scrcpy.exe --window-x 100 --window-y 100 --window-width 800 --window-height 600 -s " + deviceName);
+        });
 
         return card;
     }
 
-    private StackPane createImageContainer() {
+    private StackPane createImageContainer(String deviceName) {
         // 创建图片容器
         StackPane imageContainer = new StackPane();
         imageContainer.setMinSize(160, 200);  // 匹配图片比例
+        InputStream resourceAsStream = null;
+        try {
+            resourceAsStream = getClass().getResourceAsStream("/image/" + deviceName + ".png");
+        } catch (Exception e) {
+            resourceAsStream = getClass().getResourceAsStream("/image/screenshot.png");
+        }
 
         try {
             // 加载相同的手机屏幕截图
-            Image image = new Image(getClass().getResourceAsStream("/image/screenshot.png"));
-
+            Image image = new Image(resourceAsStream);
             // 创建ImageView
             ImageView imageView = new ImageView(image);
             imageView.setPreserveRatio(true);

@@ -9,6 +9,8 @@ public class EastCons {
     public static final String LOCK_PHONE = " shell input keyevent 26";
     public static final String UNLOCK_PHONE= " shell input keyevent 82";
     public static final String ESC= " shell input keyevent 111";
+    public static final String SC= " shell screencap -p /sdcard/";
+    public static final String PULL_SC= " pull /sdcard/";
     /**
      * adb shell input touchscreen swipe 930 880 930 380 //向上滑 <br />
      * adb shell input touchscreen swipe 930 880 330 880 //向左滑<br />

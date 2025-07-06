@@ -33,6 +33,25 @@ public class AdbAction {
         sb.append(cons);
         return sb.toString();
     }
+    public String buildSc(String id){
+        StringBuilder sb = new StringBuilder(EastCons.INIT);
+        sb.append(id);
+        sb.append(EastCons.SC);
+        sb.append(id);
+        sb.append(".png");
+        return sb.toString();
+    }
+    public String buildPullSc(String id,String path){
+        StringBuilder sb = new StringBuilder(EastCons.INIT);
+        sb.append(id);
+        sb.append(EastCons.PULL_SC);
+        sb.append(id);
+        sb.append(".png ");
+        sb.append(path);
+        sb.append(id);
+        sb.append(".png ");
+        return sb.toString();
+    }
 
     private String buildShellInput(String id,String cons){
         StringBuilder sb = new StringBuilder(EastCons.INIT);
@@ -255,16 +274,7 @@ public class AdbAction {
 
     public static void main(String[] args) {
         AdbAction adbAction = new AdbAction();
-        Map<String, String> device = adbAction.getDevice();
-        Set<String> ids = device.keySet();
-//        adbAction.hpUp(ids);
-//        adbAction.hpDown(ids);
-//        adbAction.hpLeft(ids);
-//        adbAction.hpRight(ids);
-//        adbAction.inputText(ids,"9993");
-//        adbAction.ret(ids);
-//        adbAction.click(ids,910,2281);
-        System.out.println(adbAction.getPhoneInfo(ids));
+        System.out.println(adbAction.buildPullSc("123","/image/"));
     }
 
 }
